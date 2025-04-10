@@ -24,6 +24,7 @@ from torch.utils.tensorboard import SummaryWriter
 from datetime import datetime
 import ripser
 from persim import plot_diagrams
+import config
 
 # Add the current directory to Python path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -39,25 +40,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 
 from collections import defaultdict
-
-# Configuration
-config = {
-    "dataset_name": "COIL-20",
-    "version": "d16",
-    "model_name": "default",
-    "max_epochs": 1,
-    "accelerator": "cpu",
-    "rtd_every_n_batches": 1,
-    "batch_size": 32,
-    "input_dim": 16384,  # 128x128 images
-    "latent_dim": 32,
-    "n_hidden_layers": 3,
-    "hidden_dim": 512,
-    "lr": 1e-4,
-    "card": 50,
-    "engine": "ripser",
-    "is_sym": True
-}
 
 def collate_with_matrix(batch):
     """Collate function that computes distance matrix on the fly."""
@@ -354,7 +336,7 @@ def plot_training_curves(train_losses, val_losses, save_path=None):
 
 def main():
     # Load and prepare data
-    dataset_name = config['dataset_name']
+    dataset_name = config.dataset_name
     train_data, test_data, train_labels, test_labels = load_data(dataset_name)
     
     # Create datasets
@@ -364,7 +346,7 @@ def main():
     # Create data loaders
     train_loader = DataLoader(
         train_dataset,
-        batch_size=config["batch_size"],
+        batch_size=config.batch_size,
         num_workers=2,
         collate_fn=collate_with_matrix,
         shuffle=True
@@ -372,7 +354,7 @@ def main():
 
     val_loader = DataLoader(
         test_dataset,
-        batch_size=config["batch_size"],
+        batch_size=config.batch_size,
         num_workers=2,
         collate_fn=collate_with_matrix,
         shuffle=False
@@ -380,19 +362,19 @@ def main():
 
     # Create model
     encoder, decoder = get_model(
-        input_dim=config['input_dim'],
-        latent_dim=config['latent_dim'],
-        n_hidden_layers=config['n_hidden_layers'],
-        hidden_dim=config['hidden_dim']
+        input_dim=config.input_dim,
+        latent_dim=config.latent_dim,
+        n_hidden_layers=config.n_hidden_layers,
+        hidden_dim=config.hidden_dim
     )
 
     model = RTDAutoencoder(
         encoder=encoder,
         decoder=decoder,
-        lr=config['lr'],
-        card=config['card'],
-        engine=config['engine'],
-        is_sym=config['is_sym']
+        lr=config.lr,
+        card=config.card,
+        engine=config.engine,
+        is_sym=config.is_sym
     )
 
     # Create visualization directory
@@ -404,12 +386,12 @@ def main():
         model=model,
         train_loader=train_loader,
         val_loader=val_loader,
-        model_name=config['model_name'],
-        dataset_name=config['dataset_name'],
-        accelerator=config['accelerator'],
-        max_epochs=config['max_epochs'],
-        run=config.get('n_runs', 0),
-        version=config.get('version', '')
+        model_name=config.model_name,
+        dataset_name=config.dataset_name,
+        accelerator=config.accelerator,
+        max_epochs=config.max_epochs,
+        run=getattr(config, 'n_runs', 0),
+        version=getattr(config, 'version', '')
     )
 
     # Generate visualizations

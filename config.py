@@ -13,7 +13,7 @@ hidden_dim = 512
 max_epochs = 400
 batch_size = 256
 lr = 5e-4
-accelerator = "cpu"  # Use "cuda" for GPU
+accelerator = "cuda"
 
 # RTD configuration
 rtd_every_n_batches = 1
