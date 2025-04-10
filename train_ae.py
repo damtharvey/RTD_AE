@@ -46,21 +46,17 @@ config = {
     "version": "d16",
     "model_name": "default",
     "max_epochs": 1,
-    "accelerator": "cpu",  # Changed from gpus to accelerator for newer PyTorch Lightning
+    "accelerator": "cpu",
     "rtd_every_n_batches": 1,
-    "rtd_start_epoch": 0,
-    "rtd_l": 1.0,  # rtd loss 
-    "n_runs": 1,  # number of runs for each model
-    "card": 50,  # number of points on the persistence diagram
-    "n_threads": 50,  # number of threads for parallel ripser computation
-    "latent_dim": 16,  # latent dimension
-    "input_dim": 128*128,
+    "batch_size": 32,
+    "input_dim": 16384,  # 128x128 images
+    "latent_dim": 32,
     "n_hidden_layers": 3,
     "hidden_dim": 512,
-    "batch_size": 256,
+    "lr": 1e-4,
+    "card": 50,
     "engine": "ripser",
-    "is_sym": True,
-    "lr": 5e-4
+    "is_sym": True
 }
 
 def collate_with_matrix(batch):
@@ -202,7 +198,7 @@ def train_autoencoder(model, train_loader, val_loader=None, model_name='default'
 def load_data(dataset_name='COIL-20'):
     """Load the prepared dataset."""
     # Get the absolute path to the data directory
-    current_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    current_dir = os.path.dirname(os.path.abspath(__file__))
     data_dir = os.path.join(current_dir, f"data/{dataset_name}/prepared")
     
     print(f"Loading data from: {data_dir}")

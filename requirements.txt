@@ -1,5 +1,5 @@
 torch>=1.9.0
-numpy>=1.19.2
+numpy<2.0.0
 matplotlib>=3.3.2
 tqdm>=4.50.2
 ripser>=0.6.4
