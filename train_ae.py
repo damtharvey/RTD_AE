@@ -45,7 +45,7 @@ config = {
     "dataset_name": "COIL-20",
     "version": "d16",
     "model_name": "default",
-    "max_epochs": 50,
+    "max_epochs": 1,
     "accelerator": "cpu",  # Changed from gpus to accelerator for newer PyTorch Lightning
     "rtd_every_n_batches": 1,
     "rtd_start_epoch": 0,
@@ -64,7 +64,7 @@ config = {
 }
 
 def collate_with_matrix(batch):
-    """Collate function that computes distance matrix for a batch."""
+    """Collate function that computes distance matrix on the fly."""
     data = [item[0] for item in batch]
     labels = [item[1] for item in batch]
     
@@ -74,8 +74,8 @@ def collate_with_matrix(batch):
     # Compute distance matrix
     dist_matrix = torch.cdist(data, data)
     
-    # Convert labels to tensor
-    labels = torch.tensor(labels)
+    # Convert labels to tensor with explicit dtype
+    labels = torch.tensor(labels, dtype=torch.long)
     
     return data, dist_matrix, labels
 
@@ -87,8 +87,8 @@ def collate_with_matrix_geodesic(batch):
     # Convert data to tensor directly
     data = torch.stack([torch.tensor(d, dtype=torch.float32) for d in data])
     
-    # Convert labels to tensor
-    labels = torch.tensor(labels)
+    # Convert labels to tensor with explicit dtype
+    labels = torch.tensor(labels, dtype=torch.long)
     
     return data, labels
 
