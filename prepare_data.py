@@ -20,7 +20,9 @@ def download_coil20():
         "https://raw.githubusercontent.com/scikit-learn/scikit-learn/main/sklearn/datasets/data/coil-20-proc.tar"
     ]
     
-    data_dir = "data/COIL-20"
+    # Get the absolute path to the RTD_AE directory
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    data_dir = os.path.join(current_dir, "data/COIL-20")
     os.makedirs(data_dir, exist_ok=True)
     tar_path = os.path.join(data_dir, "coil-20-proc.tar")
     
@@ -72,11 +74,11 @@ def download_coil20():
     
     # Verify extraction
     print("\nVerifying extracted files...")
-    extracted_files = glob.glob(os.path.join(extract_dir, "**", "*.png"), recursive=True)
-    print(f"Found {len(extracted_files)} PNG files in {extract_dir}")
+    extracted_files = glob.glob(os.path.join(extract_dir, "**", "*.pgm"), recursive=True)
+    print(f"Found {len(extracted_files)} PGM files in {extract_dir}")
     
     if not extracted_files:
-        print("No PNG files found after extraction. Listing directory contents:")
+        print("No PGM files found after extraction. Listing directory contents:")
         for root, dirs, files in os.walk(extract_dir):
             print(f"\nDirectory: {root}")
             for file in files:
@@ -94,8 +96,8 @@ def load_and_preprocess_data(data_path):
     images = []
     labels = []
     
-    # Get all PNG files in the directory and subdirectories
-    image_files = glob.glob(os.path.join(data_path, "**", "*.png"), recursive=True)
+    # Get all PGM files in the directory and subdirectories
+    image_files = glob.glob(os.path.join(data_path, "**", "*.pgm"), recursive=True)
     print(f"Found {len(image_files)} image files")
     
     if not image_files:
@@ -104,7 +106,7 @@ def load_and_preprocess_data(data_path):
             print(f"\nDirectory: {root}")
             for file in files:
                 print(f"  {file}")
-        raise ValueError(f"No PNG files found in {data_path}")
+        raise ValueError(f"No PGM files found in {data_path}")
     
     # Load all images
     for img_path in tqdm(image_files):
@@ -146,24 +148,51 @@ def load_and_preprocess_data(data_path):
     
     return X, y
 
+def prepare_and_save_data():
+    """Prepare and save the COIL-20 dataset."""
+    # Get the absolute path to the RTD_AE directory
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    data_dir = os.path.join(current_dir, "data/COIL-20")
+    prepared_dir = os.path.join(data_dir, "prepared")
+    
+    # Create directories if they don't exist
+    os.makedirs(prepared_dir, exist_ok=True)
+    
+    # Download and extract data if needed
+    extract_dir = os.path.join(data_dir, "coil-20-proc")
+    if not os.path.exists(extract_dir):
+        print("Dataset not found. Downloading and extracting...")
+        extract_dir = download_coil20()
+    
+    # Load and preprocess data
+    X, y = load_and_preprocess_data(extract_dir)
+    
+    # Split into train and test sets
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42, stratify=y
+    )
+    
+    # Save the prepared data
+    print("Saving prepared data...")
+    np.save(os.path.join(prepared_dir, "train_data.npy"), X_train)
+    np.save(os.path.join(prepared_dir, "test_data.npy"), X_test)
+    np.save(os.path.join(prepared_dir, "train_labels.npy"), y_train)
+    np.save(os.path.join(prepared_dir, "test_labels.npy"), y_test)
+    
+    return X_train, X_test, y_train, y_test
+
 def load_prepared_data():
     """Load the prepared COIL-20 dataset."""
-    # Get the absolute path to the data directory
-    current_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    # Get the absolute path to the RTD_AE directory
+    current_dir = os.path.dirname(os.path.abspath(__file__))
     data_dir = os.path.join(current_dir, "data/COIL-20/prepared")
     
     print(f"Looking for data in: {data_dir}")
     
-    # Check if prepared data exists
-    if not os.path.exists(data_dir):
-        print(f"Directory contents of {os.path.dirname(data_dir)}:")
-        for root, dirs, files in os.walk(os.path.dirname(data_dir)):
-            print(f"\nDirectory: {root}")
-            for file in files:
-                print(f"  {file}")
-        raise ValueError(f"Prepared data directory {data_dir} does not exist")
+    # Create directory if it doesn't exist
+    os.makedirs(data_dir, exist_ok=True)
     
-    # Load the data
+    # Check if prepared data files exist
     train_data_path = os.path.join(data_dir, "train_data.npy")
     test_data_path = os.path.join(data_dir, "test_data.npy")
     train_labels_path = os.path.join(data_dir, "train_labels.npy")
@@ -176,10 +205,8 @@ def load_prepared_data():
             missing_files.append(os.path.basename(path))
     
     if missing_files:
-        print("Missing files:")
-        for file in missing_files:
-            print(f"  - {file}")
-        raise ValueError("Some prepared data files are missing")
+        print("Some prepared data files are missing. Preparing data...")
+        return prepare_and_save_data()
     
     # Load the data
     print("Loading data files...")
@@ -195,7 +222,7 @@ def load_prepared_data():
     return X_train, X_test, y_train, y_test
 
 def main():
-    # Load prepared data
+    # Load or prepare data
     X_train, X_test, y_train, y_test = load_prepared_data()
     
     print("Data loading completed successfully")
