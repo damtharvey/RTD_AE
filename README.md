@@ -5,7 +5,6 @@ This repository contains the training code for a Topologically Regularized Autoe
 ## Project Structure
 
 ```
-train_ae/
 ├── src/
 │   ├── rtd.py          # RTD loss implementation
 │   └── utils.py        # Utility functions
