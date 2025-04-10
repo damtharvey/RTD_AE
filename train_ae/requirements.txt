@@ -1,0 +1,14 @@
+torch>=1.9.0
+numpy>=1.19.2
+matplotlib>=3.3.2
+tqdm>=4.50.2
+ripser>=0.6.4
+scikit-learn>=0.24.2
+pytorch-lightning>=1.5.0
+pandas>=1.2.0
+tensorboard>=2.4.0
+opencv-python>=4.5.0
+requests>=2.25.1
+torchvision>=0.10.0
+torchaudio>=0.9.0
+torchmetrics>=0.11.0 
