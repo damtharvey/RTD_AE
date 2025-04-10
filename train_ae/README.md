@@ -11,6 +11,7 @@ train_ae/
 │   └── utils.py        # Utility functions
 ├── data/               # Data directory
 ├── trained_models/     # Saved models
+├── prepare_data.py    # Data preparation script
 ├── train_ae.py        # Main training script
 ├── config.py          # Configuration file
 ├── requirements.txt   # Dependencies
@@ -33,8 +34,15 @@ pip install -r requirements.txt
 ## Usage
 
 1. Prepare your data:
-   - Place your data in the `data/{dataset_name}/prepared/` directory
-   - Required files: `train_data.npy`, `train_labels.npy`, `test_data.npy`, `test_labels.npy`
+   - First, run the data preparation script:
+   ```bash
+   python prepare_data.py
+   ```
+   This will:
+   - Create necessary directories
+   - Download and process the dataset
+   - Save processed data in `data/{dataset_name}/prepared/` directory
+   - Generate files: `train_data.npy`, `train_labels.npy`, `test_data.npy`, `test_labels.npy`
 
 2. Configure the model:
    - Edit `config.py` to set your desired parameters:
